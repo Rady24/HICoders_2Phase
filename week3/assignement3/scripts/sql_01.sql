@@ -1,0 +1,12 @@
+SELECT * FROM users;
+SELECT * FROM posts;
+SELECT * FROM comments;
+SELECT * FROM posts WHERE userId = 1;
+SELECT * FROM comments WHERE userId = 3;
+SELECT userId, COUNT(*) as numberOfPosts FROM posts GROUP BY userId;
+SELECT DISTINCT users.* FROM users JOIN posts ON users.id = posts.userId;
+SELECT DISTINCT posts.* FROM posts JOIN comments ON posts.id = comments.postId;
+SELECT * FROM posts WHERE id NOT IN (SELECT DISTINCT postId FROM comments);
+SELECT * FROM posts ORDER BY createdAt ASC LIMIT 1;
+SELECT * FROM comments WHERE content LIKE 'I%';
+SELECT * FROM comments WHERE postId = 3 AND isEdited = FALSE;
