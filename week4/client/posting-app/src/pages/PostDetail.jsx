@@ -2,51 +2,64 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Container, Card } from "react-bootstrap";
 import { formatDistanceToNow } from "date-fns";
-import { useDocumentTitle } from "../utils/utils";
+import Comment from "../components/Comment";
 
 function PostDetail() {
-  useDocumentTitle("Bloggy Post Details");
-
   const { postId } = useParams();
   const [post, setPost] = useState(null);
+  const [comments, setComments] = useState([]);
 
   useEffect(() => {
-    const fetchPost = async () => {
+    const fetchPostAndComments = async () => {
       try {
-        const response = await fetch(
+        const postResponse = await fetch(
           `${process.env.REACT_APP_API_URL}/api/posts/${postId}`
         );
-        if (response.ok) {
-          const data = await response.json();
-          setPost(data);
-        } else {
-          console.error("Failed to fetch post:", response.status);
-        }
+        const postData = postResponse.ok ? await postResponse.json() : null;
+        setPost(postData);
+
+        const commentsResponse = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/posts/${postId}/comments`
+        );
+        const commentsData = commentsResponse.ok
+          ? await commentsResponse.json()
+          : [];
+        setComments(commentsData);
       } catch (error) {
-        console.error("Error fetching post:", error);
+        console.error("Error fetching data:", error);
       }
     };
 
-    fetchPost();
+    fetchPostAndComments();
   }, [postId]);
 
   if (!post) {
-    return <div>Loading...</div>;
+    return <Container>Loading...</Container>;
   }
 
   return (
     <Container>
+      <Card className="mt-4">
+        <Card.Header>
+          Published{" "}
+          {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
+        </Card.Header>
+        <Card.Body>
+          <Card.Title>{post.title}</Card.Title>
+          <Card.Text>{post.content}</Card.Text>
+        </Card.Body>
+      </Card>
       <div className="mt-4">
-        <Card>
-          <Card.Header>
-            Published{" "}
-            {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
-          </Card.Header>
-          <Card.Body>
-            <Card.Title>{post.title}</Card.Title>
-            <Card.Text>{post.content}</Card.Text>
-          </Card.Body>
-        </Card>
+        <h5>Comments:</h5>
+        {comments.length > 0 ? (
+          comments.map((comment) => (
+            <Comment key={comment.id} comment={comment} />
+          ))
+        ) : (
+          <Card>
+            <Card.Body>No comments yet.</Card.Body>
+          </Card>
+        )}
       </div>
     </Container>
   );

@@ -3,6 +3,7 @@ import {
   getPosts,
   getPostById,
   createPost,
+  getPostWithComments,
 } from "../repository/posts-repository.js";
 
 const router = Router();
@@ -34,6 +35,20 @@ router.post("/", async (req, res, next) => {
     res.status(201).json(newPost);
   } catch (error) {
     next(error);
+  }
+});
+
+router.get("/:postId/comments", async (req, res) => {
+  try {
+    const postWithComments = await getPostWithComments(req.params.postId);
+    if (!postWithComments) {
+      return res.status(404).send("Post not found");
+    }
+
+    return res.json(postWithComments.Comments || []);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Server error");
   }
 });
 
