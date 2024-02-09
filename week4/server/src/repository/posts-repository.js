@@ -1,3 +1,4 @@
+import Comment from "../models/comment.js";
 import Post from "../models/post.js";
 
 const getPosts = async () => {
@@ -12,4 +13,15 @@ const createPost = async (postDetails) => {
   return await Post.create(postDetails);
 };
 
-export { getPosts, getPostById, createPost };
+const getPostWithComments = async (postId) => {
+  return await Post.findByPk(postId, {
+    include: [
+      {
+        model: Comment,
+        as: "Comments",
+      },
+    ],
+  });
+};
+
+export { getPosts, getPostById, createPost, getPostWithComments };

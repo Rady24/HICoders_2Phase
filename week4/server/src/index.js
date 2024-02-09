@@ -6,6 +6,7 @@ import sequelize from "./config/database.js";
 import { startDatabase } from "./utils/start-database.js";
 import routes from "./routes/server-routes.js";
 import cors from "cors";
+import "./config/associations.js";
 
 const app = express();
 
